@@ -1,7 +1,6 @@
 /** @format */ 
 
-const connection = require("../server");
-
+const connection = require("../config/dbconfig");
 
 function dateofbirth(params, callback) {
     connection.query(
@@ -14,4 +13,4 @@ function dateofbirth(params, callback) {
     );
 }
 
-module.exports = dateofbirth;
+module.exports = { dateofbirth };

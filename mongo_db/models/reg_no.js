@@ -1,7 +1,6 @@
 /** @format */ 
 
-const connection = require("../server");
-
+const connection = require("../config/dbconfig");
 
 function registerNumber(params, callback) {
     connection.query(
@@ -10,8 +9,9 @@ function registerNumber(params, callback) {
             if (err) {
                 return callback(false);
             }
+            callback(results);
         }
     );
 }
 
-module.exports = registerNumber;
+module.exports = { registerNumber };
