@@ -2,9 +2,11 @@
 
 const connection = require("../config/dbconfig");
 
-function registerNumber(callback) {
+function insertDateOfBirth(dateOfBirth, callback) {
+    // Assuming "dateOfBirth" is a string in a suitable format, e.g., 'YYYY-MM-DD'
     connection.query(
-        "SELECT reg_no FROM log_clg",
+        "INSERT INTO log_clg (dob) VALUES (?)",
+        [dateOfBirth],
         (err, results, fields) => {
             if (err) {
                 return callback(err); // Pass the error to the callback
@@ -14,4 +16,4 @@ function registerNumber(callback) {
     );
 }
 
-module.exports = { registerNumber };
+module.exports = { insertDateOfBirth };
