@@ -1,3 +1,5 @@
+/** @format */
+
 const connection = require("../config/dbconfig");
 
 function login(regNo, dob, callback) {

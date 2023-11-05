@@ -13,6 +13,16 @@ var cors = require("cors");
 
 app.use(bodyParser.json());
 
+app.use((err, req, res, next) => {
+    if (err instanceof SyntaxError) {
+        // Handle JSON parsing errors
+        res.status(400).json({ error: 'Invalid JSON data' });
+    } else {
+        next();
+    }
+});
+
+
 app.use(
   cors({
     origin: "*",
@@ -111,19 +121,23 @@ app.post('/login', (req, res) => {
     });
 });
 
-app.get('/attendance/:regNo', (req, res) => {
-    const regNo = req.params.regNo; // Get the regNo from the URL parameter
+app.get("/attendance/:name", (req, res) => {
+    const name = req.params.name;
 
-    getAttendanceData(regNo, (err, data) => {
+    getAttendanceData(name, (err, data) => {
         if (err) {
-            // Handle any errors here (e.g., send an error response)
-            res.status(500).json({ error: 'An error occurred while fetching attendance data.' });
+            console.error("Error:", err);
+            res.status(500).json({ error: "An error occurred while fetching attendance data." });
         } else {
-            // Send the retrieved attendance data as a JSON response
-            res.json(data);
+            if (data.length > 0) {
+                res.json(data); // Send the retrieved attendance data as a JSON response
+            } else {
+                res.json({ message: "No matching data found for the provided name." });
+            }
         }
     });
 });
+
 
 // Start the server
 const port = process.env.PORT || 4000;
