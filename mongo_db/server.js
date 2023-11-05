@@ -4,6 +4,9 @@ const { dateofbirth } = require("./models/dob"); // Import your functions
 const { registerNumber } = require("./models/reg_no");
 const { insertRegisterNumber } = require('./models/reg_no_put');
 const { insertDateOfBirth } = require('./models/dob_put');
+const { login } = require('./models/login'); 
+const { getAttendanceData } = require('./models/attendance');
+
 const bodyParser = require("body-parser"); //Middleware
 
 var cors = require("cors");
@@ -87,6 +90,40 @@ app.post('/reg_no_put', (req, res) => {
     });
 });
 
+app.post('/login', (req, res) => {
+    const { regNo, dob } = req.body; // Assuming the client sends the credentials as a JSON request body
+
+    login(regNo, dob, (err, user) => {
+        if (err) {
+            return res.status(500).json({ error: "An error occurred during login." });
+        }
+
+        if (!user) {
+            return res.status(401).json({ error: "Invalid credentials. Please check your registration number and date of birth." });
+        }
+
+        // You have a valid user object here for further processing
+        // For example, you can generate a JWT token and send it as a response
+        // or redirect the user to their dashboard.
+
+        // Here, I'm sending a success message and the user object back as a response.
+        res.status(200).json({ message: "Login successful", user });
+    });
+});
+
+app.get('/attendance/:regNo', (req, res) => {
+    const regNo = req.params.regNo; // Get the regNo from the URL parameter
+
+    getAttendanceData(regNo, (err, data) => {
+        if (err) {
+            // Handle any errors here (e.g., send an error response)
+            res.status(500).json({ error: 'An error occurred while fetching attendance data.' });
+        } else {
+            // Send the retrieved attendance data as a JSON response
+            res.json(data);
+        }
+    });
+});
 
 // Start the server
 const port = process.env.PORT || 4000;
