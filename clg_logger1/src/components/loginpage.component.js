@@ -1,83 +1,64 @@
-import React, { Component } from "react";
+import React, { useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
-export default class LoginPage extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            reg_no_put: "",
-            dob_put: ""
-        };
-    }
+const LoginPage = () => {
+    const navigate = useNavigate();
 
-    handleRegNoChange = (event) => {
-        this.setState({ reg_no_put: event.target.value });
-    }
+    const [loginData, setLoginData] = useState({
+        regNo: "",
+        dob: ""
+    });
 
-    handleDOBChange = (event) => {
-        this.setState({ dob_put: event.target.value });
-    }
+    const handleInputChange = (event) => {
+        const { name, value } = event.target;
+        setLoginData((prevData) => ({
+            ...prevData,
+            [name]: value
+        }));
+    };
 
-    handleSubmitRegNo = () => {
-        const formData = {
-            reg_no_put: this.state.reg_no_put
-        };
-
-        axios.post('http://localhost:4000/reg_no_put', formData, {
+    const handleSubmit = () => {
+        axios.post('http://localhost:4000/login', loginData, {
             headers: {
-                'Content-Type': 'application/json', // Set the content type to JSON
+                'Content-Type': 'application/json',
             }
         })
-            .then((response) => {
-                console.log("Data sent to /reg_no_put:", response.data);
-            })
-            .catch((error) => {
-                console.error("Error sending data to /reg_no_put:", error);
-            });
-    }
-
-    handleSubmitDOB = () => {
-        const formData = {
-            dob_put: this.state.dob_put
-        };
-
-        axios.post('http://localhost:4000/dob_put', formData, {
-            headers: {
-                'Content-Type': 'application/json', // Set the content type to JSON
-            }
+        .then((response) => {
+            console.log("Data sent to /login:", response.data);
+            // Redirect to /homepage with regNo as a URL parameter
+            navigate(`/homepage?regNo=${response.data.user.reg_no}`);
         })
-            .then((response) => {
-                console.log("Data sent to /dob_put:", response.data);
-            })
-            .catch((error) => {
-                console.error("Error sending data to /dob_put:", error);
-            });
-    }
+        .catch((error) => {
+            console.error("Error sending data to /login:", error);
+        });
+    };
 
-    render() {
-        return (
+    return (
+        <div>
             <div>
-                <div>
-                    <label htmlFor="reg_no_put">Registration Number:</label>
-                    <input
-                        type="text"
-                        id="reg_no_put"
-                        value={this.state.reg_no_put}
-                        onChange={this.handleRegNoChange}
-                    />
-                    <button onClick={this.handleSubmitRegNo}>Submit Registration Number</button>
-                </div>
-                <div>
-                    <label htmlFor="dob_put">Date of Birth:</label>
-                    <input
-                        type="text"
-                        id="dob_put"
-                        value={this.state.dob_put}
-                        onChange={this.handleDOBChange}
-                    />
-                    <button onClick={this.handleSubmitDOB}>Submit Date of Birth</button>
-                </div>
+                <label htmlFor="regNo">Registration Number:</label>
+                <input
+                    type="text"
+                    id="regNo"
+                    name="regNo"
+                    value={loginData.regNo}
+                    onChange={handleInputChange}
+                />
             </div>
-        );
-    }
-}
+            <div>
+                <label htmlFor="dob">Date of Birth:</label>
+                <input
+                    type="date"
+                    id="dob"
+                    name="dob"
+                    value={loginData.dob}
+                    onChange={handleInputChange}
+                />
+            </div>
+            <button onClick={handleSubmit}>Submit</button>
+        </div>
+    );
+};
+
+export default LoginPage;

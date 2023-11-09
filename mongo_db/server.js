@@ -1,11 +1,9 @@
 const express = require("express");
 const app = express();
-const { dateofbirth } = require("./models/dob"); // Import your functions
-const { registerNumber } = require("./models/reg_no");
-const { insertRegisterNumber } = require('./models/reg_no_put');
-const { insertDateOfBirth } = require('./models/dob_put');
+
 const { login } = require('./models/login'); 
 const { getAttendanceData } = require('./models/attendance');
+const { getActivityAssignmentData } = require('./models/activity_assignment');
 
 const bodyParser = require("body-parser"); //Middleware
 
@@ -21,7 +19,6 @@ app.use((err, req, res, next) => {
         next();
     }
 });
-
 
 app.use(
   cors({
@@ -39,67 +36,6 @@ app.all("/*", function (req, res, next) {
   
 const http = require("http").Server(app);
 
-// Define a route to retrieve date of birth
-app.get("/dob", (req, res) => {
-    dateofbirth((err, data) => {
-        if (err) {
-            return res.status(500).json({ error: "Error retrieving date of birth" });
-        }
-        if (data === null) {
-            return res.status(404).json({ error: "No date of birth found" });
-        }
-        res.json({ dob: data });
-    });
-});
-
-
-// Define a route to retrieve registration numbers
-app.get("/reg_no", (req, res) => {
-    registerNumber((err, data) => {
-        if (err) {
-            return res.status(500).json({ error: "Error retrieving register number" });
-        }
-        if (data === null) {
-            return res.status(404).json({ error: "No register number found" });
-        }
-        res.json({ reg_no: data });
-    });
-});
-
-app.post('/dob_put', (req, res) => {
-    // Get the date of birth from the request body
-    const { dob_put } = req.body;
-
-    if (!dob_put) {
-        return res.status(400).json({ error: 'Date of birth is required' });
-    }
-
-    // Call the insertDateOfBirth function to insert the date of birth into the database
-    insertDateOfBirth(dob_put, (err, data) => {
-        if (err) {
-            return res.status(500).json({ error: 'Error inserting date of birth' });
-        }
-        res.json({ message: 'Date of birth inserted successfully' });
-    });
-});
-
-app.post('/reg_no_put', (req, res) => {
-    // Get the registration number from the request body
-    const { reg_no_put } = req.body;
-
-    if (!reg_no_put) {
-        return res.status(400).json({ error: 'Registration number is required' });
-    }
-
-    // Call the insertRegisterNumber function to insert the registration number into the database
-    insertRegisterNumber(reg_no_put, (err, data) => {
-        if (err) {
-            return res.status(500).json({ error: 'Error inserting registration number' });
-        }
-        res.json({ message: 'Registration number inserted successfully' });
-    });
-});
-
 app.post('/login', (req, res) => {
     const { regNo, dob } = req.body; // Assuming the client sends the credentials as a JSON request body
 
@@ -111,30 +47,42 @@ app.post('/login', (req, res) => {
         if (!user) {
             return res.status(401).json({ error: "Invalid credentials. Please check your registration number and date of birth." });
         }
-
-        // You have a valid user object here for further processing
-        // For example, you can generate a JWT token and send it as a response
-        // or redirect the user to their dashboard.
-
-        // Here, I'm sending a success message and the user object back as a response.
         res.status(200).json({ message: "Login successful", user });
     });
 });
 
-app.get("/attendance/:name", (req, res) => {
-    const name = req.params.name;
+app.post('/attendance', (req, res) => {
+    const regNo = req.body.regNo;
 
-    getAttendanceData(name, (err, data) => {
+    getAttendanceData(regNo, (err, user) => {
         if (err) {
-            console.error("Error:", err);
-            res.status(500).json({ error: "An error occurred while fetching attendance data." });
-        } else {
-            if (data.length > 0) {
-                res.json(data); // Send the retrieved attendance data as a JSON response
-            } else {
-                res.json({ message: "No matching data found for the provided name." });
-            }
+            console.error("Error getting attendance data:", err);
+            return res.status(500).json({ error: "An error occurred while retrieving attendance data." });
         }
+
+        if (!user) {
+            return res.status(401).json({ error: "Attendance data not found for the given registration number." });
+        }
+
+        // Exclude reg_no and send the entire user object in the response
+        const { reg_no, ...attendanceDetails } = user;
+
+        res.status(200).json(attendanceDetails);
+    });
+});
+
+app.get("/activity-assignment", (req, res) => {
+    getActivityAssignmentData((err, data) => {
+        if (err) {
+            console.error("Error getting activity assignment data:", err);
+            return res.status(500).json({ error: "An error occurred while retrieving activity assignment data." });
+        }
+
+        if (!data) {
+            return res.status(404).json({ error: "Activity assignment data not found." });
+        }
+
+        res.status(200).json(data);
     });
 });
 

@@ -4,7 +4,7 @@ const connection = require("../config/dbconfig");
 
 function login(regNo, dob, callback) {
     connection.query(
-        "SELECT * FROM student_details WHERE register_number = ? AND dob = ?",
+        "SELECT * FROM student_details WHERE reg_no = ? AND dob = ?",
         [regNo, dob],
         (err, results, fields) => {
             if (err) {

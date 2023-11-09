@@ -2,18 +2,22 @@
 
 const connection = require("../config/dbconfig");
 
-function getAttendanceData(name, callback) {
+function getAttendanceData(regNo, callback) {
     connection.query(
-        "SELECT * FROM attendance WHERE name = ?",
-        [name],
+        "SELECT * FROM attendance WHERE reg_no = ?",
+        [regNo],
         (err, results, fields) => {
             if (err) {
-                return callback(err); // Pass the error to the callback
+                return callback(err, null); // Pass the error to the callback
             }
-
-            callback(null, results); // Return all matching rows
+            if (results.length === 0) {
+                // No matching user found
+                return callback(null, null);
+            }
+            const user = results[0]; // Assuming there's only one user with the provided reg_no and dob
+            callback(null, user); // Return all matching rows
         }
     );
 }
 
-module.exports = { getAttendanceData };
+module.exports = { getAttendanceData } ;
