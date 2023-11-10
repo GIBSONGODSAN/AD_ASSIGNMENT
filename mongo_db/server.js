@@ -4,6 +4,8 @@ const app = express();
 const { login } = require('./models/login'); 
 const { getAttendanceData } = require('./models/attendance');
 const { getActivityAssignmentData } = require('./models/activity_assignment');
+const { insertStudentDetails } = require('./models/insert_user'); 
+const { updateAttendanceStatus } = require('./models/putAttendance'); // Adjust the path accordingly
 
 const bodyParser = require("body-parser"); //Middleware
 
@@ -83,6 +85,37 @@ app.get("/activity-assignment", (req, res) => {
         }
 
         res.status(200).json(data);
+    });
+});
+
+app.post('/insertStudent', (req, res) => {
+    // Extract values from the request body
+    const { regNo, name, dob, userType } = req.body;
+
+    // Call the insertStudentDetails function
+    insertStudentDetails(regNo, name, dob, userType, (err, insertedId) => {
+        if (err) {
+            console.error("Error inserting student details:", err);
+            return res.status(500).json({ error: "Internal Server Error" });
+        }
+        // Successfully inserted, send a response with the inserted ID
+        res.status(201).json({ message:"Login Successful", insertedId });
+    });
+});
+
+app.post('/updateAttendance', (req, res) => {
+    // Extract values from the request body
+    const { columnName, attendanceValues } = req.body;
+
+    // Call the updateAttendanceStatus function
+    updateAttendanceStatus(columnName, attendanceValues, (err, results) => {
+        if (err) {
+            console.error("Error updating attendance status:", err);
+            return res.status(500).json({ error: "Internal Server Error" });
+        }
+
+        // Successfully updated, send a response with the results
+        res.status(200).json(results);
     });
 });
 
