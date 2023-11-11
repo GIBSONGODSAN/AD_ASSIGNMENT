@@ -26,8 +26,8 @@ const LoginPage = () => {
         })
         .then((response) => {
             console.log("Data sent to /login:", response.data);
-            // Redirect to /homepage with regNo as a URL parameter
-            navigate(`/homepage?regNo=${response.data.user.reg_no}`);
+            const redirectPath = response.data.user.user_type === 0 ? '/homepage' : '/adminhome';
+            navigate(`${redirectPath}?regNo=${response.data.user.reg_no}`);
         })
         .catch((error) => {
             console.error("Error sending data to /login:", error);

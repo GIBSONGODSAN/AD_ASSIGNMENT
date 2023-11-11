@@ -5,7 +5,9 @@ const { login } = require('./models/login');
 const { getAttendanceData } = require('./models/attendance');
 const { getActivityAssignmentData } = require('./models/activity_assignment');
 const { insertStudentDetails } = require('./models/insert_user'); 
-const { updateAttendanceStatus } = require('./models/putAttendance'); // Adjust the path accordingly
+const { updateAttendanceStatus } = require('./models/putAttendance'); 
+const { insertNewActivityAssignment } = require('./models/putActAss'); 
+
 
 const bodyParser = require("body-parser"); //Middleware
 
@@ -119,6 +121,21 @@ app.post('/updateAttendance', (req, res) => {
     });
 });
 
+app.post('/insertActivityAssignment', (req, res) => {
+    // Extract values from the request body
+    const { activity, assignment } = req.body;
+
+    // Call the insertNewActivityAssignment function
+    insertNewActivityAssignment(activity, assignment, (err, insertedData) => {
+        if (err) {
+            console.error("Error inserting new activity assignment:", err);
+            return res.status(500).json({ error: "Internal Server Error" });
+        }
+
+        // Successfully inserted, send a response with the inserted data
+        res.status(201).json(insertedData);
+    });
+});
 
 // Start the server
 const port = process.env.PORT || 4000;

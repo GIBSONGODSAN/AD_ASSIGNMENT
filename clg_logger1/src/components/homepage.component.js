@@ -27,9 +27,10 @@ const HomePage = () => {
         axios.get('http://localhost:4000/activity-assignment')
             .then((response) => {
                 console.log("Response from activity assignment:", response.data);
-                // Ensure that the response.data is an array before setting state
-                if (Array.isArray(response.data)) {
-                    setActivityAssignmentData(response.data);
+
+                // Check if the response has the expected properties
+                if (response.data.activity_id && response.data.assignment) {
+                    setActivityAssignmentData([response.data]);
                 } else {
                     console.error("Invalid data format for activity assignment");
                 }
