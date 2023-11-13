@@ -24,3 +24,5 @@ function App() {
 }
 
 export default App;
+
+// SET PATH=C:\Program Files\Nodejs;%PATH%

@@ -1,19 +1,30 @@
-/** @format */
-
 const connection = require("../config/dbconfig");
 
 function insertStudentDetails(regNo, name, dob, userType, callback) {
     connection.query(
         "INSERT INTO student_details (reg_no, name, dob, user_type) VALUES (?, ?, ?, ?)",
         [regNo, name, dob, userType],
-        (err, results, fields) => {
+        (err, studentResults) => {
             if (err) {
                 return callback(err); // Pass the error to the callback
             }
 
-            const insertedId = results.insertId; // Get the ID of the newly inserted row
+            const studentId = studentResults.insertId; // Get the ID of the newly inserted row
 
-            callback(null, insertedId); // Pass the inserted ID to the callback
+            // Insert the regNo into the attendance table
+            connection.query(
+                "INSERT INTO attendance (reg_no) VALUES (?)",
+                [regNo],
+                (err, attendanceResults) => {
+                    if (err) {
+                        return callback(err);
+                    }
+
+                    const attendanceId = attendanceResults.insertId; // Get the ID of the newly inserted row
+
+                    callback(null, { studentId, attendanceId }); // Pass the inserted IDs to the callback
+                }
+            );
         }
     );
 }
