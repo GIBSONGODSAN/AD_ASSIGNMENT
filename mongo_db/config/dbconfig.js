@@ -18,13 +18,12 @@ module.exports = connection;
 // CREATE TABLE student_details (
 //   reg_no INT PRIMARY KEY,
 //   name VARCHAR(255),
-//   dob DATE
+//   dob DATE, 
+//   user_type INTEGER 
 // );
 
 // CREATE TABLE attendance (
 //   reg_no INT,
-//   day1 INT,
-//   day2 INT,
 //   FOREIGN KEY (reg_no) REFERENCES student_details(reg_no)
 // );
 

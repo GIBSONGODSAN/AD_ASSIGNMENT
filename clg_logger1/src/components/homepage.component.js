@@ -43,14 +43,29 @@ const HomePage = () => {
     return (
         <div>
             <h2>Attendance Details:</h2>
-            <pre>{JSON.stringify(attendanceDetails, null, 2)}</pre>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Event</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {Object.keys(attendanceDetails).map((key, index) => (
+                        <tr key={index}>
+                            <td>{key}</td>
+                            <td>{attendanceDetails[key] === 0 ? 'Absent' : 'Present'}</td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
 
             <h2>Activity Assignment:</h2>
             <table>
                 <thead>
                     <tr>
-                        <th>Activity ID</th>
-                        <th>Assignment</th>
+                        <th>Task Name</th>
+                        <th>Task Description</th>
                     </tr>
                 </thead>
                 <tbody>

@@ -7,6 +7,7 @@ const { getActivityAssignmentData } = require('./models/activity_assignment');
 const { insertStudentDetails } = require('./models/insert_user'); 
 const { updateAttendanceStatus } = require('./models/putAttendance'); 
 const { insertNewActivityAssignment } = require('./models/putActAss'); 
+const { fetchNames } = require('./models/userName');
 
 
 const bodyParser = require("body-parser"); //Middleware
@@ -134,6 +135,16 @@ app.post('/insertActivityAssignment', (req, res) => {
 
         // Successfully inserted, send a response with the inserted data
         res.status(201).json(insertedData);
+    });
+});
+
+// Function to fetch the name from the student_details table only when the user_type is 0
+app.get('/userType', (req, res) => {
+    fetchNames((err, results) => {
+        if (err) {
+            return res.status(500).json({ error: 'Error fetching names' });
+        }
+        res.status(200).json(results); // Sending the fetched names as JSON response
     });
 });
 

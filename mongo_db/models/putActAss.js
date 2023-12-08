@@ -2,26 +2,53 @@
 const connection = require("../config/dbconfig");
 
 function insertNewActivityAssignment(activity, assignment, callback) {
-    // Insert new activity and assignment at the top of the table
-    connection.query(
-        "INSERT INTO activity_assignment (activity_id, assignment) VALUES (?, ?) ORDER BY id DESC LIMIT 1",
-        [activity, assignment],
-        (err, results) => {
-            if (err) {
-                console.error("Error inserting new activity assignment:", err);
-                return callback(err, null);
+    connection.beginTransaction((err) => {
+        if (err) {
+            console.error('Error beginning transaction:', err);
+            return callback(err, null);
+        }
+
+        // Delete existing records from activity_assignment table
+        connection.query('DELETE FROM activity_assignment', (deleteErr, deleteResults) => {
+            if (deleteErr) {
+                return connection.rollback(() => {
+                    console.error('Error deleting existing records:', deleteErr);
+                    callback(deleteErr, null);
+                });
             }
 
-            // Return the inserted data
-            const insertedData = {
-                id: results.insertId,
-                activity: activity,
-                assignment: assignment,
-            };
+            // Insert new activity and assignment
+            connection.query(
+                'INSERT INTO activity_assignment (activity_id, assignment) VALUES (?, ?)',
+                [activity, assignment],
+                (insertErr, insertResults) => {
+                    if (insertErr) {
+                        return connection.rollback(() => {
+                            console.error('Error inserting new activity assignment:', insertErr);
+                            callback(insertErr, null);
+                        });
+                    }
 
-            callback(null, insertedData);
-        }
-    );
+                    connection.commit((commitErr) => {
+                        if (commitErr) {
+                            return connection.rollback(() => {
+                                console.error('Error committing transaction:', commitErr);
+                                callback(commitErr, null);
+                            });
+                        }
+
+                        const insertedData = {
+                            id: insertResults.insertId,
+                            activity: activity,
+                            assignment: assignment,
+                        };
+
+                        callback(null, insertedData);
+                    });
+                }
+            );
+        });
+    });
 }
 
 module.exports = { insertNewActivityAssignment };

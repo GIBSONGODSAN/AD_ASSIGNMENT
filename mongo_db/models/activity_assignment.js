@@ -6,7 +6,7 @@ const connection = require("../config/dbconfig");
 
 function getActivityAssignmentData(callback) {
     connection.query(
-        "SELECT * FROM activity_assignment LIMIT 1",
+        "SELECT * FROM activity_assignment; ",
         (err, results) => {
             if (err) {
                 console.error("Error getting first activity assignment data:", err);
