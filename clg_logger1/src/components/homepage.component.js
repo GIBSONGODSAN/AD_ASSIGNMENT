@@ -41,9 +41,9 @@ const HomePage = () => {
     }, [regNo]);
 
     return (
-        <div>
+        <div className="content-container">
             <h2>Attendance Details:</h2>
-            <table>
+            <table className="attendance-table">
                 <thead>
                     <tr>
                         <th>Event</th>
@@ -61,7 +61,7 @@ const HomePage = () => {
             </table>
 
             <h2>Activity Assignment:</h2>
-            <table>
+            <table className="activity-table">
                 <thead>
                     <tr>
                         <th>Task Name</th>

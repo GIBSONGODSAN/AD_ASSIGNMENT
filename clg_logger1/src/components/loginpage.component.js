@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import '../App.css';
 
 const LoginPage = () => {
     const navigate = useNavigate();
@@ -16,7 +17,7 @@ const LoginPage = () => {
             ...prevData,
             [name]: value
         }));
-    };
+    };    
 
     const handleSubmit = () => {
         axios.post('http://localhost:4000/login', loginData, {
@@ -35,8 +36,8 @@ const LoginPage = () => {
     };
 
     return (
-        <div>
-            <div>
+        <div className="form-container">
+            <div className="form-row">
                 <label htmlFor="regNo">Registration Number:</label>
                 <input
                     type="text"
@@ -46,7 +47,7 @@ const LoginPage = () => {
                     onChange={handleInputChange}
                 />
             </div>
-            <div>
+            <div className="form-row">
                 <label htmlFor="dob">Date of Birth:</label>
                 <input
                     type="date"
@@ -56,7 +57,12 @@ const LoginPage = () => {
                     onChange={handleInputChange}
                 />
             </div>
-            <button onClick={handleSubmit}>Submit</button>
+            <div className="form-row">
+                <button onClick={handleSubmit}>Submit</button>
+            </div>
+            <div className="success-message" id="successMessage" style={{ display: 'none' }}>
+                Login Successful!
+            </div>
         </div>
     );
 };
